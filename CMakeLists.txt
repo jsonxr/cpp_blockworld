@@ -67,6 +67,11 @@ list(APPEND SOURCES
         client/src/core/Vertex.cpp
         )
 
+
+if (EMSCRIPTEN)
+    add_compile_options("SHELL:-s USE_PTHREADS -pthread")
+endif ()
+
 add_executable(blockworld ${SOURCES})
 target_link_libraries(blockworld ${CONAN_LIBS})
 
@@ -122,7 +127,7 @@ if (EMSCRIPTEN)
     #    set(EMCC_LINKER_FLAGS "${FLAGS}")
 
 
-    set(EMCC_LINKER_FLAGS "-O0 --cpuprofiler --memoryprofiler -s EXIT_RUNTIME=1 --bind -s INITIAL_MEMORY=512MB -s WASM=1  -s ALLOW_MEMORY_GROWTH=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_GLFW=3 -s WASM_BIGINT=1 -std=c++${CMAKE_CXX_STANDARD} --embed-file ${PROJECT_SOURCE_DIR}/client/assets@/assets -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1 -s GL_ASSERTIONS=1")
+    set(EMCC_LINKER_FLAGS "-O0 --cpuprofiler --memoryprofiler -s USE_PTHREADS -pthread -s PTHREAD_POOL_SIZE=4 -s EXIT_RUNTIME=1 --bind -s INITIAL_MEMORY=512MB -s WASM=1  -s ALLOW_MEMORY_GROWTH=1 -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2 -s USE_GLFW=3 -s WASM_BIGINT=1 -std=c++${CMAKE_CXX_STANDARD} --embed-file ${PROJECT_SOURCE_DIR}/client/assets@/assets -s ASSERTIONS=1 -s DEMANGLE_SUPPORT=1 -s GL_ASSERTIONS=1")
 
     set(CMAKE_EXECUTABLE_SUFFIX .html)
     set_target_properties(blockworld PROPERTIES LINK_FLAGS ${EMCC_LINKER_FLAGS})

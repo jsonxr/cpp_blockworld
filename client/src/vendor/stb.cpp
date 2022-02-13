@@ -2,6 +2,7 @@
 #define APP_STB_H
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #define STBI_NO_JPEG
 //#define STBI_NO_PNG
 #define STBI_NO_BMP
@@ -11,12 +12,9 @@
 #define STBI_NO_HDR
 #define STBI_NO_PIC
 #define STBI_NO_PNM
-#include <stb_image.h>
+#include "vendor/stb_image.h"
+#include "vendor/stb_image_write.h"
 #undef STB_IMAGE_IMPLEMENTATION
-
-#define STB_IMAGE_WRITE_IMPLEMENTATION
-//#define STBI_WRITE_NO_STDIO // stdio version of functions
-#include <stb_image_write.h>
 #undef STB_IMAGE_WRITE_IMPLEMENTATION
 
 #endif  // APP_STB_H

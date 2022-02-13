@@ -1,16 +1,17 @@
 #include <set>
+#include <thread>
 
 #include "constants.h"
 #include "core.h"
 #include "core/Assets.h"
 #include "core/Camera.h"
 #include "core/Material.h"
-#include "core/Window.h"
 #include "core/textures/TextureAtlas.h"
+#include "core/Window.h"
 #include "importer/MinecraftImporter.h"
-#include "utils/Tracer.h"
 #include "utils/env.h"
 #include "utils/memory.h"
+#include "utils/Tracer.h"
 #include "world/BlockMap.h"
 #include "world/Chunk.h"
 
@@ -125,7 +126,24 @@ auto main2() -> int {  // NOLINT(bugprone-exception-escape)
   return 0;
 }
 
+void print(int n, const std::string &str) {
+  std::string msg = std::to_string(n) + " : " + str;
+  std::cout << msg << std::endl;
+}
+
 auto main(int /*argc*/, char ** /*argv*/, char **envp) -> int {
+  std::vector<std::string> s = {"Educative.blog", "Educative", "courses",
+                                "are great"};
+  std::vector<std::thread> threads{};
+
+  for (int i = 0; i < s.size(); i++) {
+    threads.push_back(std::thread(print, i, s[i]));
+  }
+
+  for (auto &th : threads) {
+    th.join();
+  }
+
   //  // utils::dump_env(envp);
   //  // utils::display_sizeof_values();
   //  auto total_memory = utils::getTotalSystemMemory();

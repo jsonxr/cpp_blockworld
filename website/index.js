@@ -11,6 +11,7 @@ const app = express();
 app.use((req, res, next) => {
   res.set("Cross-Origin-Opener-Policy", "same-origin");
   res.set("Cross-Origin-Resource-Policy", "same-origin");
+  res.set("Cross-Origin-Embedder-Policy", "require-corp");
   next();
 });
 

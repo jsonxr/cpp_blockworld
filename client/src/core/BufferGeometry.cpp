@@ -131,7 +131,6 @@ void BufferGeometryGfx::render() const {
   if (elements_size_ == 0) {
     glBindVertexArray(glVao_);  // Is this even needed?
     glDrawArrays(GL_TRIANGLES, 0, count_);
-    cout << count_;
   } else {
     glBindVertexArray(glVao_);  // Is this even needed?
     // glBindVertexArray(glVbo_);  // Is this even needed?
