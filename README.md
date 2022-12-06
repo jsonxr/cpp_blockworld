@@ -38,7 +38,7 @@ Install
   # Show available versions of minecraft on a mac
   bin/minecraft-extract
   # Extract specific version of minecraft
-  bin/minecraft-extract 1.18.1
+  bin/minecraft-extract 1.18.2 extracted
   ```
 
 # Compile
@@ -116,9 +116,10 @@ Install the following plugins, then follow compile directions.
 
 # Resources
 
-- [Definitive Guide to Creating a Window | How to Code Minecraft Ep. 1](https://www.youtube.com/watch?v=HhH_9DnMBgw)
+- [memory](https://www.gamedev.net/articles/programming/general-and-gameplay-programming/c-custom-memory-allocation-r3010/)
+  - Efficient memory allocation in games
+- [optick](https://optick.dev/) - super-lightweight c++ profiler for games
 - [setup on mac. need to code sign?](https://giovanni.codes/opengl-setup-in-macos/)
-- [Faithful 1.18 Resource Pack](https://faithful.team/faithful-1-18/)
 - [Better way to handle opengl resources](https://github.com/polytypic/gl.cpp)
 - [glTF 2.0 Overview](https://kcoley.github.io/glTF/specification/2.0/figures/gltfOverview-2.0.0a.png)
 - [Gaffer on Games - Fix your timestep](https://gafferongames.com/post/fix_your_timestep/)
@@ -126,6 +127,8 @@ Install the following plugins, then follow compile directions.
 - [Learn OpenGL](https://learnopengl.com)
 - [WebGL2 fundamentals](https://webgl2fundamentals.org/)
 - [clang-tidy list of checks](https://clang.llvm.org/extra/clang-tidy/checks/list.html)
+- [Use turns, not radians...](https://www.computerenhance.com/p/turns-are-better-than-radians)
+- [better than jwt](https://paseto.io/)
 
 # C++ Standard
 
@@ -133,11 +136,25 @@ https://en.cppreference.com/w/cpp/compiler_support
 
 # Libraries
 
-- [glfw - GL windowing library](https://www.glfw.org/): zlib/libpng License
-- [glad - GL bootstrap](https://github.com/Dav1dde/glad): MIT License
-- [glm - GL Math](https://github.com/g-truc/glm): The Happy Bunny License or MIT License
-- [tinygltf - GLTF file loading](https://github.com/syoyo/tinygltf): MIT License
-- [stb - image processing](https://github.com/nothings/stb): MIT License or Public Domain
+- [boost/1.78.0](https://www.boost.org/) - Boost library. BSL-1.0 License
+- [entt](https://github.com/skypjack/entt) - Entity Component System. MIT License
+- [expected-lite](https://github.com/martinmoene/expected-lite) - cpp23 std::expected implementation. BSL-1.0 License
+- [glad](https://github.com/Dav1dde/glad) - GL bootstrap. MIT License
+- [glfw](https://www.glfw.org/) - GL windowing library. zlib/libpng License
+- [glm](https://github.com/g-truc/glm) - GL Math. The Happy Bunny License or MIT License
+- [nlohmann_json/3.10.5](https://github.com/nlohmann/json) - JSON parsing library. MIT License
+- [stb](https://github.com/nothings/stb) - image processing MIT License or Public Domain
+- [tinygltf](https://github.com/syoyo/tinygltf) - GLTF file loading. MIT License
+
+### Under consideration multithreading...
+
+- [Bungee's multithreading talk](https://www.youtube.com/watch?v=v2Q_zHG3vqg)
+- [Ron Fosner's Task-Based Multithreading](https://www.gdcvault.com/play/1012321/Task-based-Multithreading-How-to) Job's are ideally between 0.5-2 miliseconds so kinda big...
+- [taskflow](https://github.com/taskflow/taskflow) - Task system for multi-threading. MIT License.
+
+# Tools
+
+- [block bench](https://www.blockbench.net/downloads) - low polygon editor
 
 # TODO
 
@@ -145,19 +162,8 @@ https://en.cppreference.com/w/cpp/compiler_support
   - [blog article](https://jeremimucha.com/2021/05/cmake-managing-resources/)
   - [gist](https://gist.github.com/jamcodes/f79b3be24ed40c6c224cc9e91d3061cc)
 - per vertex data... make vertex color use rgba=4bytes instead of 4 floats
-- Block map... load all available blocks in the minecraft models folder.
-- cull faces
-- https://github.com/SRombauts/SimplexNoise
+- [Faster compression than zlib](https://github.com/ebiggers/libdeflate)
 
 # WebGL2
 
 - TextureArray (Bug in m1 mac that causes it to fail)
-
-# Noise
-
-- []()
-- [Seed a perlin noise](https://solarianprogrammer.com/2012/07/18/perlin-noise-cpp-11/)
-
-# Ambient Lighting
-
-# Serialization

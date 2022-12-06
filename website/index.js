@@ -9,8 +9,10 @@ console.log("dir:", dir);
 
 const app = express();
 app.use((req, res, next) => {
+  //Cross-Origin-Resource-Policy: cross-origin
+
   res.set("Cross-Origin-Opener-Policy", "same-origin");
-  res.set("Cross-Origin-Resource-Policy", "same-origin");
+  res.set("Cross-Origin-Resource-Policy", "cross-origin");
   res.set("Cross-Origin-Embedder-Policy", "require-corp");
   next();
 });

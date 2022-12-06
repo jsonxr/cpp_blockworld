@@ -44,6 +44,9 @@ void set_debug(bool debug) { debug_ = debug; }
 using std::cout;
 using std::endl;
 
+//------------------------------------------------------------------------------
+// display_sizeof_values
+//------------------------------------------------------------------------------
 void display_sizeof_values() {
   cout << "Size of char : " << sizeof(char) << " byte" << endl;
   cout << "Size of int : " << sizeof(int) << " bytes" << endl;
@@ -59,6 +62,9 @@ void display_sizeof_values() {
   cout << "Size of size_t : " << sizeof(size_t) << " bytes" << endl;
 }
 
+//------------------------------------------------------------------------------
+// getTotalSystemMemory
+//------------------------------------------------------------------------------
 auto getTotalSystemMemory() -> size_t {
   //  auto pages = sysconf(_SC_PHYS_PAGES);
   //  std::cout << "pages=" << pages << std::endl;
@@ -71,6 +77,9 @@ auto getTotalSystemMemory() -> size_t {
   //  return pages * page_size;
 }
 
+//------------------------------------------------------------------------------
+// prettyBytes
+//------------------------------------------------------------------------------
 auto prettyBytes(size_t bytes) -> std::string {
   std::array<std::string, 7> suffixes{
       "B", "KB", "MB", "GB", "TB", "PB", "EB",

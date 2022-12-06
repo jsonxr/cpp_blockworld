@@ -1,22 +1,31 @@
 #!/bin/sh
 
-MINECRAFT_VERSION=$1
-if [ "$MINECRAFT_VERSION" == "" ]; then
+help () {
+  echo "Usage minecraft-extract <version> <dir>"
   versions=`ls -t ~/Library/Application\ Support/minecraft/versions/ | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | sort --reverse`
   echo "Available versions: " $versions
-
   versions=($versions)
   latest=${versions[0]}
   echo "latest: $latest"
+  echo "Example:"
+  echo "  minecraft-extract $latest extracted"
+  echo
+  exit 1
+}
+
+MINECRAFT_VERSION=$1
+OUTPUT_DIR=$2
+if [ "$MINECRAFT_VERSION" == "" ]; then
+  help
+fi
+if [ "$OUTPUT_DIR" == "" ]; then
+  help
+fi
+if [ -d "$OUTPUT_DIR" ] || [ -f "$OUTPUT_DIR" ]; then
+  echo "Error. Directory or file already exists"
+  echo
   exit 1
 fi
 
-# versions=`ls -t ~/Library/Application\ Support/minecraft/versions/ | grep -E '^[0-9]+\.[0-9]+\.[0-9]+' | sort --reverse`
-# versions=($versions)
-# MINECRAFT_VERSION=${versions[0]}
-
-TEMP=$(mktemp -d)
-rm -rf client/assets/minecraft
-unzip  ~/Library/Application\ Support/minecraft/versions/$MINECRAFT_VERSION/$MINECRAFT_VERSION.jar "assets/minecraft/*" "data/minecraft/*" -d $TEMP
-mv $TEMP/assets/minecraft client/assets
-mv $TEMP/data/minecraft client/assets/minecraft/data
+mkdir $OUTPUT_DIR
+unzip  ~/Library/Application\ Support/minecraft/versions/$MINECRAFT_VERSION/$MINECRAFT_VERSION.jar "assets/minecraft/*" "data/minecraft/*" "pack.png" "version.json" -d $OUTPUT_DIR

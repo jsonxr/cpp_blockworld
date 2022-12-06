@@ -12,8 +12,8 @@
 #define STBI_NO_HDR
 #define STBI_NO_PIC
 #define STBI_NO_PNM
-#include "vendor/stb_image.h"
-#include "vendor/stb_image_write.h"
+#include <stb_image.h>
+#include <stb_image_write.h>
 #undef STB_IMAGE_IMPLEMENTATION
 #undef STB_IMAGE_WRITE_IMPLEMENTATION
 

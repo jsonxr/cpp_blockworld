@@ -9,11 +9,17 @@
 #include <string>
 #include <vector>
 
+#include "nonstd/expected.hpp"
 #include "vendor/glfw.h"
 #include "vendor/glm.h"
 
 using std::cout;
 using std::endl;
+using std::string;
+using std::vector;
+
+using namespace nonstd;
+using namespace std::literals;
 
 using uint64 = uint64_t;
 using uint32 = uint32_t;

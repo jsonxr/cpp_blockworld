@@ -46,6 +46,8 @@ list(APPEND SOURCES
         client/src/core/Window.cpp
         #src/importer
         client/src/importer/MinecraftImporter.cpp
+        #src/platforms
+        client/src/platforms/main_options.cpp
         #src/vendor
         client/src/vendor/SimplexNoise.cpp
         #src/world
@@ -72,7 +74,7 @@ if (EMSCRIPTEN)
     add_compile_options("SHELL:-s USE_PTHREADS -pthread")
 endif ()
 
-add_executable(blockworld ${SOURCES})
+add_executable(blockworld ${SOURCES} client/src/Application.cpp client/src/Application.h)
 target_link_libraries(blockworld ${CONAN_LIBS})
 
 if (EMSCRIPTEN)

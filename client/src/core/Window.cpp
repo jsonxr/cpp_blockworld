@@ -47,11 +47,12 @@ Window::Window() : Window("OpenGL Window", WindowSize{}, false) {}
 Window::Window(const char *title, WindowSize size, bool fullScreenMode) noexcept
     : size_(size) {
   // Highest OpenGL version Mac supports is 4.1
+  glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 #ifdef __APPLE__
-  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);  // Required for mac
+  glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
   // Is primaryMonitor leaking memory?

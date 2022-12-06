@@ -1,10 +1,13 @@
 [requires]
 boost/1.78.0
+entt/3.9.0
+expected-lite/0.5.0
 glfw/3.3.6
 glad/0.1.34
 glm/0.9.9.8
 nlohmann_json/3.10.5
 stb/cci.20210713
+
 
 tinygltf/2.5.0
 ms-gsl/3.1.0

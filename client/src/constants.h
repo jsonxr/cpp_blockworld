@@ -1,7 +1,3 @@
-//
-// Created by Jason Rowland on 2/9/22.
-//
-
 #ifndef APP_CONSTANTS_H
 #define APP_CONSTANTS_H
 
