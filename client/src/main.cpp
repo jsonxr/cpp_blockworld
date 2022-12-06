@@ -54,7 +54,7 @@ auto main2() -> int {  // NOLINT(bugprone-exception-escape)
   }
 
   auto atlas = std::make_shared<TextureAtlas>(ivec2{1024, 1024});
-  atlas->loadFromDirectory("minecraft:block/", "/minecraft/textures/block");
+  atlas->loadFromDirectory("minecraft:block/", "/minecraft/assets/minecraft/textures/block");
   atlas->loadFromDirectory("textures:block/", "/textures/block");
   atlas->save("test.png");
 

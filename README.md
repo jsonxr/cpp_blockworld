@@ -8,6 +8,7 @@ Install
 
 - direnv `brew install direnv`
 - cmake `brew install cmake`
+- node `brew install node`
 - [emscripten](https://emscripten.org/)
 
   ```sh
@@ -23,13 +24,11 @@ Install
   git pull
   ./emsdk install latest
   ./emsdk activate latest
+
+  # If you are not using direnv, you will need to make sure you have the vars in .envrc
+  # source .envrc
   ```
 
-  ```sh
-  # .zprofile
-  export EMSDK_HOME=/opt/emsdk
-  source $EMSDK_HOME/emsdk_env.sh > /dev/null 2>&1
-  ```
 
 - [Conan package manager](https://conan.io/) - `brew install conan`
 - Copy minecraft files...
@@ -38,22 +37,24 @@ Install
   # Show available versions of minecraft on a mac
   bin/minecraft-extract
   # Extract specific version of minecraft
-  bin/minecraft-extract 1.18.2 extracted
+  bin/minecraft-extract 1.18.2 client/assets/minecraft/assets/minecraft
   ```
 
-# Compile
+# Desktop Compile
 
 ```sh
 # libc++ vs stdlibc++ might depend on platform...
 # https://stackoverflow.com/questions/14972425/should-i-use-libc-or-libstdc
 # Install
 conan install . -s build_type=Debug -s compiler.libcxx=libc++ -s cppstd=20 --install-folder=build --build missing
-cd build && cmake .. && cmake --build .
+cd build
+cmake ..
+cmake --build .
 
 # optional...
 # This will use the assets in the project instead of relying on cmake to copy.
 # This avoids being confused when you change a shader and nothing happens.
-# BLOCKWORLD_ASSETS_PATH=$(pwd)/client/assets
+export BLOCKWORLD_ASSETS_PATH=$(pwd)/client/assets
 
 # Run app...
 bin/blockworld
@@ -66,13 +67,21 @@ bin/blockworld
 
 Uses Experimental Features: [WebAssembly Roadmap](https://webassembly.org/roadmap/)
 
-- Exceptions (Chrome, In progress: Firefox, No: Safari) - We just have to deal with crashes until this is supported
-- Threads and atomics (Chrome, Firefox, In progress: Safari) - Not used yet, but we will want to...
-- WebGPU
+`                       Desktop Browser               Mobile Browsers     Native`
+
+| Feature             | Chrome   | Firefox | Safari | Android  | iPhone | Wasmtime | Wasmer |
+|---------------------|----------|---------|--------|----------|--------|----------|--------|
+| Version             | 108      | 107     | 16.1   | 106      | 16.1   | no       | no     |
+| Exceptions          | ✓        | ✓       | ✓      | ✓        | ✓      | no       | no     |
+| Threads and atomics | ✓        | ✓       | ✓      | ✓        | ✓      | no       | no     |
+| WebGPU              | flag     | flag    | flag   | no       | no     | no       | no     |
+
 
 ```sh
 conan install . -s build_type=Debug -s compiler.libcxx=libc++ -s cppstd=20 --install-folder=build-wasm --build missing
-cd build-wasm && emcmake cmake .. && cmake --build .
+cd build-wasm
+emcmake cmake ..
+cmake --build .
 
 # Run app...
 npx http-server bin  # This assumes node is installed...
