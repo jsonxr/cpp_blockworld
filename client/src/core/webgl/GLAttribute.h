@@ -3,6 +3,7 @@
 
 #include <array>
 #include <map>
+#include <string>
 #include <variant>
 
 #include "GLShader.h"

@@ -12,6 +12,7 @@
 #include <map>
 #include <memory>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -38,9 +39,9 @@ struct BlockDisplay {
 //----------------------------------------------------------
 
 struct BlockFace {
-  std::string texture{};
-  std::string cullface{};
-  std::vector<double> uv{};
+  std::string texture;
+  std::string cullface;
+  std::vector<double> uv;
   std::optional<double> rotation;
   int tintindex{-1};
 };
@@ -65,11 +66,11 @@ struct BlockElementRotation {
 //----------------------------------------------------------
 
 struct BlockElement {
-  std::vector<double> from{};
-  std::vector<double> to{};
+  std::vector<double> from;
+  std::vector<double> to;
   std::optional<BlockElementRotation> rotation;
   std::optional<bool> shade;
-  std::map<std::string, BlockFace> faces{};
+  std::map<std::string, BlockFace> faces;
   std::string comment;
 };
 [[maybe_unused]] void to_json(json &j, const BlockElement &b);
@@ -83,11 +84,11 @@ struct BlockModel {
  public:
   std::string name;
   std::string parent;
-  std::map<std::string, std::string> textures{};
-  std::vector<BlockElement> elements{};
-  std::optional<bool> ambientocclusion{};
+  std::map<std::string, std::string> textures;
+  std::vector<BlockElement> elements;
+  std::optional<bool> ambientocclusion;
   std::string gui_light;
-  std::map<std::string, BlockDisplay> display{};
+  std::map<std::string, BlockDisplay> display;
 };
 [[maybe_unused]] void to_json(json &j, const BlockModel &b);
 [[maybe_unused]] void from_json(const json &j, BlockModel &b);
@@ -152,8 +153,8 @@ class MinecraftImporter {
   auto get_block_model(const std::string &name) -> BlockModel;
 
  private:
-  std::map<std::string, json> models_{};
-  std::map<std::string, json> states_{};
+  std::map<std::string, json> models_;
+  std::map<std::string, json> states_;
 };
 
 [[maybe_unused]] void debug_block_map(bool reparse = false);

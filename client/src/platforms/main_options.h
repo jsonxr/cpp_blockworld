@@ -6,7 +6,7 @@
 
 namespace app {
 
-auto parseApplicationOptions(int argc, char **argv, char **envp)
+auto parseApplicationOptions(int argc, char **argv)
     -> expected<ApplicationOptions, string>;
 
 }

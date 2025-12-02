@@ -1,8 +1,12 @@
 #include "BoxGeometry.h"
 
+#include <array>
 #include <glm/gtx/normal.hpp>
+#include <glm/geometric.hpp>
 
 #include "BufferGeometry.h"
+#include "Vertex.h"
+#include "../vendor/glm.h"
 
 namespace app::box_geometry {
 
@@ -46,7 +50,7 @@ void add_quad(BufferGeometry &geometry, const std::array<vec3, 4> &vertices,
   auto normal = glm::normalize(glm::triangleNormal(v1, v2, v3));
   if (geometry.isIndexed) {
     // TODO: Should be number of vertices... count()?
-    int size = static_cast<int>(geometry.vertices.size());
+    const int size = static_cast<int>(geometry.vertices.size());
     geometry.vertices.insert(geometry.vertices.end(),
                              {
                                  Vertex{.pos = vec3{v1.x, v1.y, v1.z},
@@ -90,7 +94,9 @@ void add_quad(BufferGeometry &geometry, const std::array<vec3, 4> &vertices,
   }
 }
 
-static vec4 vec4_zero{};
+namespace {
+constexpr vec4 kVec4Zero{};
+}  // namespace
 
 void add_cube(BufferGeometry &bufferGeometry, const BoxOptions &options) {
   auto p1 = options.p1;  // vec3{-x_size, -y_size, -z_size};
@@ -105,22 +111,22 @@ void add_cube(BufferGeometry &bufferGeometry, const BoxOptions &options) {
   auto g = p1;
   auto h = vec3{p2.x, p1.y, p1.z};
 
-  if (options.xp != vec4_zero) {
+  if (options.xp != kVec4Zero) {
     add_quad(bufferGeometry, {d, c, h, e}, options.xp);  // right
   }
-  if (options.xn != vec4_zero) {
+  if (options.xn != kVec4Zero) {
     add_quad(bufferGeometry, {f, g, b, a}, options.xn);  // left
   }
-  if (options.yp != vec4_zero) {
+  if (options.yp != kVec4Zero) {
     add_quad(bufferGeometry, {f, a, d, e}, options.yp);  // top
   }
-  if (options.yn != vec4_zero) {
+  if (options.yn != kVec4Zero) {
     add_quad(bufferGeometry, {b, g, h, c}, options.yn);  // bottom
   }
-  if (options.zp != vec4_zero) {
+  if (options.zp != kVec4Zero) {
     add_quad(bufferGeometry, {a, b, c, d}, options.zp);  // front
   }
-  if (options.zn != vec4_zero) {
+  if (options.zn != kVec4Zero) {
     add_quad(bufferGeometry, {e, h, g, f}, options.zn);  // back
   }
 }

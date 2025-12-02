@@ -5,11 +5,13 @@
 #ifndef APP_GLTYPES_H
 #define APP_GLTYPES_H
 
+#include <cstdint>
+
 #include "vendor/glfw.h"
 
 namespace app {
 
-enum class GLType {
+enum class GLType : std::uint16_t {
   kUnknown = 0,
   kSampler2d = GL_SAMPLER_2D,
   kMat4f = GL_FLOAT_MAT4,

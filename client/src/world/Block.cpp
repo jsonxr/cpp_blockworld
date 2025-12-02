@@ -5,9 +5,16 @@
 #include "Block.h"
 
 #include "../core/BoxGeometry.h"
+#include "../core/BufferGeometry.h"
+#include "../core.h"
+#include "../core/textures/TextureAtlas.h"
+#include "Chunk.h"
 #include "BlockMap.h"
+#include <string>
 
 namespace app {
+
+namespace {
 
 struct BlockOffset {
   ivec3 add{};
@@ -50,9 +57,11 @@ auto adjacent(const Chunk &chunk, const BlockMap &map,
   return kZero;
 }
 
+}  // namespace
+
 void BlockGfx::add(BufferGeometry &geometry, const Chunk &chunk,
                    const BlockMap &map, const TextureAtlas &atlas,
-                   const ivec3 &pos, const Block &block, uint16 index) {
+                   const ivec3 &pos, const Block &block, uint16 /*index*/) {
   // cout << pos.x << "," << pos.y << "," << pos.z << " index=" << index <<
   // endl;
 

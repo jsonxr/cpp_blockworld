@@ -4,6 +4,12 @@
 
 #include "GLUniform.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
+#include "../../vendor/glfw.h"
+#include "../../vendor/glm.h"
+#include "GLTypes.h"
+
 namespace app {
 
 void GLUniform::apply() {

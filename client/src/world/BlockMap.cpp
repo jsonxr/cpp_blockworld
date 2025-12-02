@@ -4,7 +4,11 @@
 
 #include "BlockMap.h"
 
-#include "utils/memory.h"
+#include <cstddef>
+#include <utility>
+
+#include "../core.h"
+#include "Block.h"
 
 namespace app {
 
@@ -68,25 +72,23 @@ BlockMap::BlockMap() {
 }
 
 void BlockMap::add_block(Block block) {
-  auto index = blocks_.size();
-  auto name = block.name;
+  const auto index = blocks_.size();
+  const auto name = block.name;
   blocks_.emplace_back(std::move(block));
   by_name_.emplace(name, index);
 }
 
 auto BlockMap::get_block(int16 id) const noexcept -> const Block * {
-  if (id < 0 || id >= blocks_.size()) {
+  if (id < 0 || static_cast<std::size_t>(id) >= blocks_.size()) {
     return nullptr;
   }
-  const auto *block = &blocks_.at(id);
-  return block;
+  return &blocks_[static_cast<std::size_t>(id)];
 }
 
 auto BlockMap::get_block_id(const std::string &name) const noexcept -> int16 {
-  by_name_.contains(name);
-  if (by_name_.contains(name)) {
-    auto id = by_name_.at(name);
-    return id;
+  const auto it = by_name_.find(name);
+  if (it != by_name_.end()) {
+    return it->second;
   }
 
   return 0;

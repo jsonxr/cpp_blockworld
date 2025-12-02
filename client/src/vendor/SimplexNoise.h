@@ -7,7 +7,10 @@
  * Distributed under the MIT License (MIT) (See accompanying file LICENSE.txt
  * or copy at http://opensource.org/licenses/MIT)
  */
-#pragma once
+#ifndef APP_VENDOR_SIMPLEXNOISE_H
+#define APP_VENDOR_SIMPLEXNOISE_H
+
+// NOLINTBEGIN
 
 #include <array>
 #include <cstddef>  // size_t
@@ -90,3 +93,6 @@ class SimplexNoise {
       222, 114, 67,  29,  24,  72,  243, 141, 128, 195, 78,  66,  215, 61,  156,
       180};
 };
+
+// NOLINTEND
+#endif  // APP_VENDOR_SIMPLEXNOISE_H

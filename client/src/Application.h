@@ -13,7 +13,7 @@ class Application {
  public:
   Application(ApplicationOptions options = ApplicationOptions{})
       : options_(options){};
-  void init();
+  void init() const;
   void run();
 
  private:

@@ -1,19 +1,15 @@
-#include <set>
 #include <string>
-#include <thread>
 
 #include "Application.h"
 #include "constants.h"
 #include "core.h"
 #include "core/Assets.h"
-#include "core/Camera.h"
 #include "core/Material.h"
 #include "core/Window.h"
 #include "core/textures/TextureAtlas.h"
 #include "importer/MinecraftImporter.h"
 #include "platforms/main_options.h"
 #include "utils/Tracer.h"
-#include "utils/env.h"
 #include "world/BlockMap.h"
 #include "world/Chunk.h"
 
@@ -22,6 +18,7 @@
 #endif
 
 using namespace app;
+// NOLINTBEGIN
 
 constexpr auto kWindowTitle = "BlockWorld";
 
@@ -135,7 +132,7 @@ void print(int n, const std::string &str) {
 }
 
 auto main(int argc, char **argv, char **envp) -> int {
-  auto options = parseApplicationOptions(argc, argv, envp);
+  auto options = parseApplicationOptions(argc, argv);
   if (!options) {
     return 1;
   }
@@ -166,3 +163,4 @@ auto main(int argc, char **argv, char **envp) -> int {
   //  //  main_import();
   // return main2();
 }
+// NOLINTEND

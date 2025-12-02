@@ -26,9 +26,9 @@ static std::vector<BufferAttribute> vertex_attributes = {{
 //  with just bytes and attributes and agnostic to what the vertex is
 struct BufferGeometry {
   bool isIndexed{};
-  std::vector<BufferAttribute> attributes{};
-  std::vector<Vertex> vertices{};
-  std::vector<int> elements{};
+  std::vector<BufferAttribute> attributes;
+  std::vector<Vertex> vertices;
+  std::vector<int> elements;
 };
 
 class BufferGeometryGfx {

@@ -1,6 +1,7 @@
 #ifndef APP_CORE_WEBGL_H_GLUNIFORM_H
 #define APP_CORE_WEBGL_H_GLUNIFORM_H
 
+#include <string>
 #include <variant>
 #include "core.h"
 #include "GLTypes.h"
@@ -14,8 +15,8 @@ struct GLUniform {
   GLType type;
   GLint size;
 
-  GlValue value_{};
-  GlValue current_value_{};
+  GlValue value_;
+  GlValue current_value_;
 
   void apply();
 

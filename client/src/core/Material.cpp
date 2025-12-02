@@ -1,10 +1,14 @@
 #include "Material.h"
 
 #include <iostream>
-#include <regex>
+#include <memory>
+#include <utility>
 
-#include "Assets.h"
-#include "Window.h"
+#include "../vendor/glfw.h"
+#include "../vendor/glm.h"
+#include "Camera.h"
+#include "textures/TextureAtlas.h"
+
 
 namespace app {
 
@@ -16,7 +20,7 @@ Material::Material(std::shared_ptr<TextureAtlas> textures)
   // Get locations of uniforms for vertex/fragment shaders
   u_chunk_offset_ = program_.get_uniform("ChunkOffset");
   u_model_ = program_.get_uniform("model");
-  u_model_->set_value(glm::mat4(1.0F));
+  u_model_->set_value(mat4{1.0F});
   u_texture0_ = program_.get_uniform("texture0");
   u_view_ = program_.get_uniform("view");
   u_projection_ = program_.get_uniform("projection");
@@ -26,7 +30,7 @@ Material::Material(std::shared_ptr<TextureAtlas> textures)
 
 void Material::render(const Camera &camera) const {
   if (!program_.use()) {
-    std::cerr << "WebGLMaterial::use program not available" << std::endl;
+    std::cerr << "WebGLMaterial::use program not available" << '\n';
     return;
   }
 

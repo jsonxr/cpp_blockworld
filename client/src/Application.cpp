@@ -4,9 +4,9 @@
 
 namespace app {
 
-void Application::init() {
+void Application::init() const {
   cout << "headless=" << options_.headless << "\nthreads=" << options_.threads
-       << endl;
+       << '\n';
 }
 
 void Application::run() {}

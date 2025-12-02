@@ -10,19 +10,26 @@ written using modern c++ instead.
 
 Install
 
-- Install tools
+- Install cmake and llvm via homebrew
   ```sh
-  brew install direnv cmake node conan
+  brew install cmake llvm
+  ```
+
+- Intall [mise](https://mise.jdx.dev/)
+
+  cmake: unmaintained repo for cmake that causes apple security warning
+  clang: no clang-tidy installed when using mise version
+
+  ```sh
+  mise trust
   ```
 
 - [Conan package manager](https://conan.io/)
 
   ```sh
-  # Conan version 2.23.0
-  brew install conan
+  # Installed vi mise
   conan remote update conancenter --url="https://center2.conan.io"
-  conan profile list # Lists the profiles...
-  conan profile detect # Create a default profile if it doesn't exist
+  conan profile detect --force # Overwrite default profile
   ```
 
 - Copy minecraft files...
@@ -42,10 +49,9 @@ Install
 # libc++ vs stdlibc++ might depend on platform...
 # https://stackoverflow.com/questions/14972425/should-i-use-libc-or-libstdc
 
-# Build
-bin/native-build
-# Run. Make sure you've previously extracted minecraft assets mentioned above
-BLOCKWORLD_ASSETS_PATH=$(pwd)/client/assets ./build/native/blockworld
+# Build Debug native
+bin/build
+bin/build --wasm
 
 ```
 

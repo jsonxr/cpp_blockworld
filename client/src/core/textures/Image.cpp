@@ -1,5 +1,10 @@
 #include "Image.h"
 
+#include <filesystem>
+#include <utility>
+
+#include "Pixel.h"
+
 namespace app {
 
 Image::Image(std::filesystem::path path)
@@ -11,7 +16,6 @@ Image::~Image() {
   channels_ = 0;
   height_ = 0;
   width_ = 0;
-  path_ = "";
   if (pixels_ != nullptr) {
     stbi_image_free(pixels_);
     pixels_ = nullptr;

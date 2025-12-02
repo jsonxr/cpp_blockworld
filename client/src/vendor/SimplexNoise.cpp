@@ -29,6 +29,7 @@
 #include <cstdint>  // int32_t/uint8_t
 #include <random>
 
+// NOLINTBEGIN
 /**
  * Computes the largest integer value not greater than the float one
  *
@@ -523,3 +524,5 @@ float SimplexNoise::fractal(size_t octaves, float x, float y, float z) const {
 
   return (output / denom);
 }
+
+// NOLINTEND

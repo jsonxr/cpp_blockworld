@@ -5,10 +5,18 @@ project(blockworld)
 
 # This comes from conan install output... Look for: "conanfile.txt: CMakeDeps necessary find_package() and targets for your CMakeLists.txt"
 
-find_package(Boost)
+# GLFW is provided by Emscripten when using -s USE_GLFW=3, so only look for the
+# native package when not building for the web.
+set(BUILDING_EMSCRIPTEN OFF)
+if(DEFINED EMSCRIPTEN OR CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
+    set(BUILDING_EMSCRIPTEN ON)
+endif()
+if(NOT BUILDING_EMSCRIPTEN)
+    find_package(Boost)
+    find_package(glfw3)
+endif()
 find_package(EnTT)
 find_package(expected-lite)
-find_package(glfw3)
 find_package(glad)
 find_package(glm)
 find_package(TinyGLTF)
@@ -21,12 +29,14 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Set macOS deployment target to match prebuilt Boost libraries (16.0)
-if(APPLE)
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "16.0")
-endif()
+# if(APPLE)
+#     set(CMAKE_OSX_DEPLOYMENT_TARGET "16.0")
+# endif()
 
-if (!EMSCRIPTEN)
-    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;--config-file=${CMAKE_SOURCE_DIR}/.clang-tidy;-p ${CMAKE_BINARY_DIR}/compile_commands.json")
+if (NOT BUILDING_EMSCRIPTEN)
+    # Use llvm clang-tidy; pass build dir with -p to avoid grouping issues
+    # Only report diagnostics from project headers (client/*) to cut noise from deps
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-p;${CMAKE_BINARY_DIR};--config-file=${CMAKE_SOURCE_DIR}/.clang-tidy;-header-filter;${PROJECT_SOURCE_DIR}/client/.*")
 endif ()
 
 
@@ -74,7 +84,7 @@ list(APPEND SOURCES
 )
 
 # Add desktop-only sources
-if(NOT EMSCRIPTEN)
+if(NOT BUILDING_EMSCRIPTEN)
     list(APPEND SOURCES
         client/src/utils/executable.cpp
         client/src/utils/memory.cpp
@@ -82,7 +92,7 @@ if(NOT EMSCRIPTEN)
 
 endif()
 
-if (EMSCRIPTEN)
+if (BUILDING_EMSCRIPTEN)
     # Enable threading for web build
     add_compile_options("-s" "USE_PTHREADS=1" "-pthread")
 endif ()
@@ -91,7 +101,7 @@ add_executable(blockworld ${SOURCES} client/src/Application.cpp client/src/Appli
 #target_link_libraries(blockworld ${CONAN_LIBS})
 
 
-if (DEFINED EMSCRIPTEN)
+if (BUILDING_EMSCRIPTEN)
 
     target_link_libraries(blockworld EnTT::EnTT nonstd::expected-lite glfw glad::glad glm::glm TinyGLTF::TinyGLTF nlohmann_json::nlohmann_json stb::stb Microsoft.GSL::GSL)
 

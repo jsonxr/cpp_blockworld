@@ -1,5 +1,12 @@
 #include "Camera.h"
 
+#include <algorithm>
+#include <cmath>
+#include <glm/ext/matrix_clip_space.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/geometric.hpp>
+#include <glm/trigonometric.hpp>
+
 #include "../vendor/glm.h"
 
 namespace app {
@@ -12,8 +19,7 @@ Camera::Camera(const CameraOptions options) : options_{options} {}
 void Camera::set_options(CameraOptions options) {
   options_ = options;
   // pitch
-  if (options_.pitch > kUp) options_.pitch = kUp;
-  if (options_.pitch < -kUp) options_.pitch = -kUp;
+  options_.pitch = std::clamp(options_.pitch, -kUp, kUp);
   // yaw
   if (options_.yaw > 360) options_.yaw = 0;
   if (options_.yaw < 0) options_.yaw = 360;
@@ -36,12 +42,12 @@ void Camera::calculateMatrices() {
                                  options_.near, options_.far);
 
   // view matrix
-  vec3 look_at = glm::normalize(vec3(
+  const vec3 look_at = glm::normalize(vec3(
       cos(glm::radians(options_.pitch)) * cos(glm::radians(options_.yaw)),
       sin(glm::radians(options_.pitch)),
       sin(glm::radians(options_.yaw)) * cos(glm::radians(options_.pitch))));
-  vec3 local_right = glm::cross(look_at, vec3(0, 1, 0));
-  vec3 local_up = glm::cross(local_right, look_at);
+  const vec3 local_right = glm::cross(look_at, vec3(0, 1, 0));
+  const vec3 local_up = glm::cross(local_right, look_at);
   view_ = glm::lookAt(options_.pos, options_.pos + look_at, local_up);
 }
 

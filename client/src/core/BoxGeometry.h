@@ -1,6 +1,7 @@
 #ifndef APP_BOXGEOMETRY_H
 #define APP_BOXGEOMETRY_H
 
+#include <array>
 #include <optional>
 #include <utility>
 

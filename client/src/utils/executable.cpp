@@ -18,6 +18,7 @@
 #include <sys/types.h>
 #endif
 
+// NOLINTBEGIN
 namespace utils {
 
 /*
@@ -72,3 +73,4 @@ auto get_executable_dir() -> std::filesystem::path {
 }
 
 }  // namespace utils
+// NOLINTEND

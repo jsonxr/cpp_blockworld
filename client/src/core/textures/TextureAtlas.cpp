@@ -1,7 +1,21 @@
 #include "TextureAtlas.h"
 
+#include <algorithm>
+#include <cstring>
+#include <filesystem>
+#include <iostream>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include "../../core.h"
+#include "../../vendor/glfw.h"
 #include "../Assets.h"
 #include "Image.h"
+#include "TextureRect.h"
+#include "Pixel.h"
 
 namespace app {
 
@@ -11,30 +25,34 @@ namespace app {
 // Perhaps, do this more efficiently by using rectangles of available pixels...
 // https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference
 
+namespace {
+
 using Position = ivec2;
 
 void sortTextureRects(std::vector<TextureRect> &rects) {
   // Sort largest to smallest since larger are harder to place
-  std::sort(rects.begin(), rects.end(), [](TextureRect &r1, TextureRect &r2) {
-    // Sort by height, then by width, then by filename
-    return r1.height == r2.height ? r1.width == r2.width
-                                        ? r1.path.compare(r2.path) < 0
-                                        : r1.width > r2.width
-                                  : r1.height > r2.height;
+  std::ranges::sort(rects, [](const TextureRect &lhs, const TextureRect &rhs) -> bool {
+    if (lhs.height != rhs.height) {
+      return lhs.height > rhs.height;
+    }
+    if (lhs.width != rhs.width) {
+      return lhs.width > rhs.width;
+    }
+    return lhs.path.compare(rhs.path) < 0;
   });
 }
 
 auto checkPosition(const TextureAtlas &atlas, const TextureRect &texture,
                    const TextureGrid &used, const Position &pos) -> bool {
-  uint16 pos_x = pos.x;
-  uint16 pos_y = pos.y;
-  uint16 out_x_slots = atlas.width() / atlas.min_size();
-  uint16 out_y_slots = atlas.height() / atlas.min_size();
+  const auto pos_x = static_cast<uint16>(pos.x);
+  const auto pos_y = static_cast<uint16>(pos.y);
+  const auto out_x_slots = static_cast<uint16>(atlas.width() / atlas.min_size());
+  const auto out_y_slots = static_cast<uint16>(atlas.height() / atlas.min_size());
 
-  uint16 y_slots = texture.height / atlas.min_size() +
-                   std::min(1, texture.height % atlas.min_size());
-  uint16 x_slots = texture.width / atlas.min_size() +
-                   std::min(1, texture.width % atlas.min_size());
+  const auto y_slots = static_cast<uint16>((texture.height / atlas.min_size()) +
+                   std::min(1, texture.height % atlas.min_size()));
+  const auto x_slots = static_cast<uint16>((texture.width / atlas.min_size()) +
+                   std::min(1, texture.width % atlas.min_size()));
 
   if ((pos_x + x_slots > out_x_slots) || (pos_y + y_slots > out_y_slots)) {
     return false;
@@ -43,7 +61,7 @@ auto checkPosition(const TextureAtlas &atlas, const TextureRect &texture,
   bool open = true;
   for (uint16 y = 0; y < y_slots; y++) {
     for (uint16 x = 0; x < x_slots; x++) {
-      int offset = ((pos_y + y) * out_x_slots) + (pos_x + x);
+      const int offset = ((pos_y + y) * out_x_slots) + (pos_x + x);
       open = open && (used.at(offset) == 0);
     }
   }
@@ -52,20 +70,20 @@ auto checkPosition(const TextureAtlas &atlas, const TextureRect &texture,
 
 void markPosition(const TextureAtlas &atlas, TextureRect &texture,
                   TextureGrid &used, const Position &pos) {
-  uint16 y_slots = texture.height / atlas.min_size() +
-                   std::min(1, texture.height % atlas.min_size());
-  uint16 x_slots = texture.width / atlas.min_size() +
-                   std::min(1, texture.width % atlas.min_size());
+  const auto y_slots = static_cast<uint16>((texture.height / atlas.min_size()) +
+                   std::min(1, texture.height % atlas.min_size()));
+  const auto x_slots = static_cast<uint16>((texture.width / atlas.min_size()) +
+                   std::min(1, texture.width % atlas.min_size()));
 
-  uint16 pos_x = pos.x;
-  uint16 pos_y = pos.y;
+  const auto pos_x = static_cast<uint16>(pos.x);
+  const auto pos_y = static_cast<uint16>(pos.y);
 
-  uint16 out_x_slots = atlas.width() / atlas.min_size();
+  const auto out_x_slots = static_cast<uint16>(atlas.width() / atlas.min_size());
   // uint16 out_y_slots = atlas.height() / atlas.min_size();
 
   for (uint16 y = 0; y < y_slots; y++) {
     for (uint16 x = 0; x < x_slots; x++) {
-      int offset = ((pos_y + y) * out_x_slots) + (pos_x + x);
+      const int offset = ((pos_y + y) * out_x_slots) + (pos_x + x);
       used.at(offset) = texture.id;
     }
   }
@@ -73,10 +91,10 @@ void markPosition(const TextureAtlas &atlas, TextureRect &texture,
 
 auto findPosition(const TextureAtlas &atlas, const TextureRect &texture,
                   const TextureGrid &used) -> std::optional<Position> {
-  uint16 output_y_slots = atlas.height() / atlas.min_size() +
-                          std::min(1, atlas.height() % atlas.min_size());
-  uint16 output_x_slots = atlas.width() / atlas.min_size() +
-                          std::min(1, atlas.width() % atlas.min_size());
+  const auto output_y_slots = static_cast<uint16>((atlas.height() / atlas.min_size()) +
+                          std::min(1, atlas.height() % atlas.min_size()));
+  const auto output_x_slots = static_cast<uint16>((atlas.width() / atlas.min_size()) +
+                          std::min(1, atlas.width() % atlas.min_size()));
 
   for (uint16 y = 0; y < output_y_slots; y++) {
     for (uint16 x = 0; x < output_x_slots; x++) {
@@ -93,7 +111,7 @@ auto findPosition(const TextureAtlas &atlas, const TextureRect &texture,
 auto setPositionsForRegions(const TextureAtlas &atlas,
                             std::vector<TextureRect> &regions)
     -> std::unique_ptr<TextureGrid> {
-  int slots = (atlas.width() * atlas.height()) / atlas.min_size();
+  const int slots = (atlas.width() * atlas.height()) / atlas.min_size();
   auto used = std::make_unique<TextureGrid>(slots);
   // TextureGrid used(slots);
 
@@ -101,17 +119,17 @@ auto setPositionsForRegions(const TextureAtlas &atlas,
     auto pos = findPosition(atlas, r, *used);
     if (!pos) {
       std::cout << "Could not find room for " << r.path.filename().string()
-                << std::endl;
+                << '\n';
       continue;
     }
 
     r.x = pos->x * atlas.min_size();
     r.y = pos->y * atlas.min_size();
-    float ux = static_cast<float>(r.x) / static_cast<float>(atlas.width());
-    float uy = static_cast<float>(r.y) / static_cast<float>(atlas.height());
-    float vx =
+    const float ux = static_cast<float>(r.x) / static_cast<float>(atlas.width());
+    const float uy = static_cast<float>(r.y) / static_cast<float>(atlas.height());
+    const float vx =
         static_cast<float>(r.x + r.width) / static_cast<float>(atlas.width());
-    float vy =
+    const float vy =
         static_cast<float>(r.y + r.height) / static_cast<float>(atlas.height());
     r.uv = {ux, uy, vx, vy};
     markPosition(atlas, r, *used, *pos);
@@ -126,13 +144,13 @@ void copyPixels(const TextureAtlas &atlas, const TextureRect &texture,
   auto image = std::make_unique<Image>(texture.path);
 
   for (uint16 y = 0; y < texture.height; y++) {
-    int offset = y * texture.width * kChannels;
-    unsigned char *current_raw_pixel = &image->pixels()[offset];
+    const int offset = static_cast<int>(y) * texture.width * kChannels;
+    const unsigned char *current_raw_pixel = &image->pixels()[offset];
 
-    int calc_y = (texture.y) + y;
-    int y_offset = calc_y * atlas.width();
-    int x_offset = texture.x;
-    int byte_offset = y_offset + x_offset;
+    const int calc_y = (texture.y) + y;
+    const int y_offset = calc_y * atlas.width();
+    const int x_offset = texture.x;
+    const int byte_offset = y_offset + x_offset;
 
     if (byte_offset < pixels.size()) {
       Pixel &current_pixel = pixels[byte_offset];
@@ -140,10 +158,12 @@ void copyPixels(const TextureAtlas &atlas, const TextureRect &texture,
       // DANGER... Bug prone memcpy here...
       memcpy(&current_pixel, current_raw_pixel, sizeof(Pixel) * texture.width);
     } else {
-      std::cout << "out of range" << std::endl;
+      std::cout << "out of range" << '\n';
     }
   }
 }
+
+}  // namespace
 
 // fmt::format causes emscripten to fail to link
 //
@@ -180,7 +200,7 @@ void copyPixels(const TextureAtlas &atlas, const TextureRect &texture,
 TextureAtlas::TextureAtlas(const ivec2 &size, uint8 min_size)
     : size_{size}, min_size_{min_size} {
   if (!isPowerOf2(size.x) || !isPowerOf2(size.y)) {
-    cout << "Warning!! not a power of 2" << endl;
+    std::cout << "Warning!! not a power of 2" << '\n';
   }
 }
 
@@ -208,7 +228,7 @@ auto TextureAtlas::pack() -> std::unique_ptr<TextureGrid> {
 
 auto TextureAtlas::generatePixels() -> std::unique_ptr<TexturePixels> {
   auto used = pack();
-  int area = size_.x * size_.y;
+  const int area = size_.x * size_.y;
   auto pixels = std::make_unique<TexturePixels>(area);
 
   // Copy the pixels from the source to the dest
@@ -227,26 +247,25 @@ auto TextureAtlas::compile() -> GLuint {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size_.x, size_.y, 0, GL_RGBA,
                GL_UNSIGNED_BYTE, pixels->data());
-  glBindTexture(GL_TEXTURE_2D, NULL);  // reset
+  glBindTexture(GL_TEXTURE_2D, 0);  // reset
   return handle_;
 }
 
 void TextureAtlas::save(const std::string &filename) {
   auto pixels = this->generatePixels();
-  int stride_in_bytes = size_.x * static_cast<int>(sizeof(Pixel));
+  const int stride_in_bytes = size_.x * static_cast<int>(sizeof(Pixel));
   stbi_write_png(filename.c_str(), size_.x, size_.y, 4, pixels->data(),
                  stride_in_bytes);
 }
 
 auto TextureAtlas::getRectByName(const std::string &name) const noexcept
     -> const TextureRect * {
-  auto it = std::find_if(
-      regions_.begin(), regions_.end(),
-      [&name](const TextureRect &rect) { return rect.name == name; });
-  if (it != regions_.end()) {
-    return &(*it);
+  const auto it = std::ranges::find_if(
+      regions_, [&name](const TextureRect &rect) -> bool { return rect.name == name; });
+  if (it == regions_.end()) {
+    return nullptr;
   }
-  return nullptr;
+  return &(*it);
 }
 
 // TODO - Implement sub_folder recursion
@@ -254,9 +273,9 @@ void TextureAtlas::loadFromDirectory(const std::string &prefix,
                                      const std::string &path,
                                      bool /*sub_folders*/) {
   Assets::forEachFile(
-      path, ".+\\.png", [this, &prefix](const std::filesystem::path &filepath) {
+      path, ".+\\.png", [this, &prefix](const std::filesystem::path &filepath) -> void {
         auto image = std::make_unique<app::Image>(filepath);
-        std::string name = prefix + image->path().stem().string();
+        const std::string name = prefix + image->path().stem().string();
         app::TextureRect rect{};
         rect.name = name;
         rect.path = image->path();

@@ -1,9 +1,0 @@
-#!/bin/bash
-
-BUILD=build/native
-BUILD_TYPE=Debug
-#BUILD_TYPE=Release
-
-conan install . -s build_type=$BUILD_TYPE -s compiler.libcxx=libc++ -s compiler.cppstd=gnu20 --output-folder=$BUILD --build=missing
-cmake -S . -B $BUILD -DCMAKE_TOOLCHAIN_FILE="$BUILD/conan_toolchain.cmake" -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-cmake --build $BUILD

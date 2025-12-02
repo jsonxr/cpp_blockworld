@@ -31,7 +31,7 @@ class TextureAtlas {
   auto compile() -> GLuint;
   auto generatePixels() -> std::unique_ptr<TexturePixels>;
   auto add(TextureRect &&region) -> uint16;
-  void save(const std::string &filename);
+ void save(const std::string &filename);
   auto getRectByName(const std::string &name) const noexcept
       -> const TextureRect *;
   void loadFromDirectory(const std::string &prefix, const std::string &filepath,
@@ -40,7 +40,7 @@ class TextureAtlas {
  private:
   uint16 min_size_{kTextureAtlasMinSize};
   ivec2 size_{kTextureAtlasDefaultSize, kTextureAtlasDefaultSize};
-  std::vector<TextureRect> regions_{};
+  std::vector<TextureRect> regions_;
   GLuint handle_{0};
 };
 

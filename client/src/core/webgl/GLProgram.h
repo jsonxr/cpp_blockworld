@@ -3,6 +3,7 @@
 
 #include <array>
 #include <map>
+#include <string>
 
 #include "IntResource.h"
 #include "GLShader.h"
@@ -42,13 +43,13 @@ class GLProgram {
   void apply_uniforms() const;
 
   void debug();
-  //auto get_uniform(const std::string &name) const -> const GLUniform *;
+ //auto get_uniform(const std::string &name) const -> const GLUniform *;
   auto get_uniform(const std::string &name) -> GLUniform *;
   static auto create (const std::string &vertex, const std::string &fragment) -> GLProgram;
  private:
-  GLProgramResource handle_{};
-  std::map<std::string, GLUniform> var_uniforms_{};
-  std::map<std::string, GLAttribute> var_attributes_{};
+  GLProgramResource handle_;
+  std::map<std::string, GLUniform> var_uniforms_;
+  std::map<std::string, GLAttribute> var_attributes_;
 };
 
 }  // namespace app

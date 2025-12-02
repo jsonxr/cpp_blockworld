@@ -1,8 +1,18 @@
 #include "MinecraftImporter.h"
 
+#include <filesystem>
+#include <iostream>
+#include <map>
+#include <memory>
+#include <optional>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <nlohmann/json.hpp>
+
 #include "../core/Assets.h"
 
-using json = nlohmann::json;
 using Assets = app::Assets;
 
 namespace importer {
@@ -70,24 +80,22 @@ namespace importer {
 }
 [[maybe_unused]] void from_json(const json &j, BlockMultipart &b) {
   if (j.contains("when")) {
-    auto value = j["when"];
+    const auto &value = j["when"];
     if (value.contains("OR")) {
-      auto dictionaries = value["OR"].get<std::vector<Dictionary>>();
-      b.when = dictionaries;
+      b.when = value["OR"].get<std::vector<Dictionary>>();
     } else {
-      auto dictionary = value.get<Dictionary>();
-      b.when = std::vector<Dictionary>{dictionary};
+      b.when = std::vector<Dictionary>{value.get<Dictionary>()};
     }
   }
   if (j.contains("apply")) {
-    auto value = j["apply"];
+    const auto &value = j["apply"];
     if (!value.is_array()) {
       b.apply = std::vector<BlockVariant>{value.get<BlockVariant>()};
     } else {
       b.apply = value.get<std::vector<BlockVariant>>();
     }
   } else {
-    std::cout << j << std::endl;
+    std::cout << j << '\n';
   }
 }
 
@@ -118,10 +126,10 @@ namespace importer {
 }
 [[maybe_unused]] void from_json(const json &j, BlockStates &b) {
   if (j.contains("variants")) {
-    auto variants = j.at("variants").get<json::object_t>();
-    for (auto &obj : variants) {
-      auto key = obj.first;
-      auto value = obj.second;
+    const auto variants = j.at("variants").get<json::object_t>();
+    for (const auto &obj : variants) {
+      const auto &key = obj.first;
+      const auto &value = obj.second;
       if (!value.is_array()) {
         b.variants[key] = std::vector<BlockVariant>{value.get<BlockVariant>()};
       } else {
@@ -344,21 +352,25 @@ namespace importer {
 // Private Functions
 //------------------------------------------------------------------------------
 
+namespace {
+
 auto read_json(const std::string &path, const std::string &prefix)
     -> std::map<std::string, json> {
   std::map<std::string, json> map{};
   Assets::forEachFile(
       path, ".+\\.json",
-      [&map, &path, &prefix](const std::filesystem::path &filepath) {
-        std::string asset_name =
+      [&map, &path, &prefix](const std::filesystem::path &filepath) -> void {
+        const std::string asset_name =
             path + std::string{"/"} + filepath.filename().string();
-        std::string str = Assets::loadString(asset_name);
-        auto src = json::parse(str);
-        auto name = prefix + filepath.stem().string();  // minecraft:block/dirt
+        const std::string str = Assets::loadString(asset_name);
+        const auto src = json::parse(str);
+        const auto name = prefix + filepath.stem().string();  // minecraft:block/dirt
         map.emplace(name, src);
       });
   return map;
 }
+
+}  // namespace
 
 void MinecraftImporter::load() {
   states_ = read_json("/minecraft/blockstates", "minecraft:block/");
@@ -389,7 +401,7 @@ auto MinecraftImporter::get_block_model(const std::string &name) -> BlockModel {
 
     if (obj.contains("parent")) {
       auto parent = obj["parent"].get<std::string>();
-      if (parent.find("minecraft:", 0) != 0) {
+      if (!parent.starts_with("minecraft:")) {
         parent.insert(0, "minecraft:");
       }
 
@@ -413,12 +425,11 @@ auto MinecraftImporter::get_block(const std::string &name) -> ImportedBlock {
   auto models = std::map<std::string, BlockModel>();
 
   for (const auto &variants_pair : states.variants) {
-    auto list = variants_pair.second;
+    const auto list = variants_pair.second;
     for (const auto &variant : list) {
-      auto model_name = variant.model;
+      const auto model_name = variant.model;
       if (!models.contains(model_name)) {
-        // auto model =
-        BlockModel model = get_block_model(model_name);
+        const BlockModel model = get_block_model(model_name);
         models.emplace(model_name, model);
       }
     }
@@ -427,8 +438,8 @@ auto MinecraftImporter::get_block(const std::string &name) -> ImportedBlock {
   block.states = std::move(states);
   block.models = std::move(models);
 
-  json j2 = block;
-  std::cout << j2 << std::endl;
+  const json j2 = block;
+  std::cout << j2 << '\n';
   return block;
 }
 
@@ -446,18 +457,18 @@ void debug_missing_models() {
   // Show block states with a non-matching model
   std::map<std::string, std::string> referenced_models{};
   for (const auto &s : states) {
-    std::cout << s.first << std::endl;
+    std::cout << s.first << '\n';
 
-    BlockStates blockstate = s.second;
+    const BlockStates blockstate = s.second;
     for (const auto &v : blockstate.variants) {
       for (const auto &variant : v.second) {
         auto name = variant.model;
         if (!name.empty()) {
-          if (name.find("minecraft:", 0) != 0) {
+          if (!name.starts_with("minecraft:")) {
             name.insert(0, "minecraft:");
           }
           referenced_models.emplace(name, s.first);
-          std::cout << "      variant=" << name << std::endl;
+          std::cout << "      variant=" << name << '\n';
         }
       }
     }
@@ -465,20 +476,20 @@ void debug_missing_models() {
       for (const auto &variant : m.apply) {
         auto name = variant.model;
         if (!name.empty()) {
-          if (name.find("minecraft:", 0) != 0) {
+          if (!name.starts_with("minecraft:")) {
             name.insert(0, "minecraft:");
           }
           referenced_models.emplace(name, s.first);
-          std::cout << "    multipart=" << name << std::endl;
+          std::cout << "    multipart=" << name << '\n';
         }
       }
     }
   }
 
   for (const auto &s : referenced_models) {
-    auto model = blocks.get_block_model(s.first);
+    const auto model = blocks.get_block_model(s.first);
     if (model.elements.empty()) {
-      std::cout << s.first << "  <--  " << s.second << std::endl;
+      std::cout << s.first << "  <--  " << s.second << '\n';
     }
   }
 }
@@ -489,26 +500,28 @@ void debug_missing_models() {
  *
  * @return std::unique_ptr<std::map<std::string, BlockStates>>
  */
+namespace {
+
 auto debug_read_block_states(bool reparse = false)
     -> std::unique_ptr<std::map<std::string, BlockStates>> {
   auto map = std::make_unique<std::map<std::string, BlockStates>>();
   Assets::forEachFile(
       "/minecraft/blockstates", ".+\\.json",
-      [&map, reparse](const std::filesystem::path &filepath) {
-        std::string asset_name = std::string{"/minecraft/blockstates/"} +
-                                 filepath.filename().string();
-        std::string str = Assets::loadString(asset_name);
-        auto src = json::parse(str);
+      [&map, reparse](const std::filesystem::path &filepath) -> void {
+        const std::string asset_name = std::string{"/minecraft/blockstates/"} +
+                                       filepath.filename().string();
+        const std::string str = Assets::loadString(asset_name);
+        const auto src = json::parse(str);
         auto obj = src.get<BlockStates>();
 
         obj.name = std::string{"minecraft:block/"} + filepath.stem().string();
         map->emplace(obj.name, obj);
 
         if (reparse) {
-          json j2 = obj;
-          auto patch = json::diff(j2, src);
+          const json j2 = obj;
+          const auto patch = json::diff(j2, src);
           if (!patch.empty()) {
-            std::cout << "Warning: " << filepath.string() << std::endl;
+            std::cout << "Warning: " << filepath.string() << '\n';
           }
         }
       });
@@ -526,20 +539,20 @@ auto debug_read_block_models(bool reparse = false)
   auto map = std::make_unique<std::map<std::string, BlockModel>>();
   Assets::forEachFile(
       "/minecraft/models/block", ".+\\.json",
-      [&map, reparse](const std::filesystem::path &filepath) {
-        std::string asset_name = std::string{"/minecraft/models/block/"} +
-                                 filepath.filename().string();
-        std::string str = Assets::loadString(asset_name);
-        auto src = json::parse(str);
+      [&map, reparse](const std::filesystem::path &filepath) -> void {
+        const std::string asset_name = std::string{"/minecraft/models/block/"} +
+                                       filepath.filename().string();
+        const std::string str = Assets::loadString(asset_name);
+        const auto src = json::parse(str);
         auto obj = src.get<BlockModel>();
         obj.name = std::string{"minecraft:block/"} + filepath.stem().string();
         map->emplace(obj.name, obj);
 
         if (reparse) {
-          json j2 = obj;
-          auto patch = json::diff(j2, src);
+          const json j2 = obj;
+          const auto patch = json::diff(j2, src);
           if (!patch.empty()) {
-            std::cout << "Warning: " << filepath.string() << std::endl;
+            std::cout << "Warning: " << filepath.string() << '\n';
           }
         }
       });
@@ -551,5 +564,7 @@ auto debug_read_block_models(bool reparse = false)
   debug_read_block_models(reparse);
   debug_missing_models();
 }
+
+}  // namespace
 
 }  // namespace importer

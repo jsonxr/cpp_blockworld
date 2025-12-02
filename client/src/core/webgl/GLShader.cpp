@@ -1,9 +1,15 @@
 #include "GLShader.h"
 
+#include <array>
+#include <iostream>
+
+#include "../../core.h"
+#include "../../vendor/glfw.h"
+
 namespace app {
 
 GLShader::~GLShader() {
-  std::cout << "~WebGLShader " << handle_ << std::endl;
+  std::cout << "~WebGLShader " << handle_ << '\n';
   if (handle_ > 0) {
     glDeleteShader(handle_);
   }
@@ -11,7 +17,7 @@ GLShader::~GLShader() {
 
 GLShader::GLShader(WebGLShaderType type, const char *source)
     : handle_{glCreateShader(static_cast<GLenum>(type))} {
-  std::cout << "WebGLShader " << handle_ << std::endl;
+  std::cout << "WebGLShader " << handle_ << '\n';
 
   glShaderSource(this->handle_, 1, &source, nullptr);
   glCompileShader(this->handle_);
@@ -24,7 +30,7 @@ GLShader::GLShader(WebGLShaderType type, const char *source)
     glGetShaderInfoLog(handle_, sizeof(log), nullptr, log.data());
     std::cerr << "ERROR::SHADER::"
               << "::COMPILATION_FAILED\n"
-              << log.data() << std::endl;
+              << log.data() << '\n';
 
     glDeleteShader(handle_);
     handle_ = 0;

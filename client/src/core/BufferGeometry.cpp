@@ -1,12 +1,17 @@
 #include "BufferGeometry.h"
 
-#include <bit>
 #include <iostream>
-#include <vector>
+#include <cstddef>
+#include <utility>
+
+#include "../vendor/glfw.h"
+#include "Vertex.h"
 
 namespace app {
 
+namespace {
 auto sizeofGlType(GLenum t) -> int;
+}
 
 //------------------------------------------------------------------------------
 // BufferGeometry
@@ -42,7 +47,7 @@ auto sizeofGlType(GLenum t) -> int;
 // BufferGeometryGfx
 //------------------------------------------------------------------------------
 BufferGeometryGfx::BufferGeometryGfx(const BufferGeometry &geometry) {
-  std::cout << "BufferGeometryGfx()" << std::endl;
+  std::cout << "BufferGeometryGfx()" << '\n';
   //
   //  int stride = 0;
   //  for (const auto &a : geometry.attributes) {
@@ -50,8 +55,8 @@ BufferGeometryGfx::BufferGeometryGfx(const BufferGeometry &geometry) {
   //  }
   //  // size = total bytes = stride * vertex (3floats-pos and 2floats-uv))
   //  int size = static_cast<GLint>(geometry.vertices.size() * sizeof(GLfloat));
-  int stride = sizeof(Vertex);
-  int vertex_bytes = static_cast<int>(geometry.vertices.size() * stride);
+  const int stride = sizeof(Vertex);
+  const int vertex_bytes = static_cast<int>(geometry.vertices.size() * stride);
 
   glGenVertexArrays(1, &glVao_);
   glBindVertexArray(glVao_);
@@ -66,18 +71,19 @@ BufferGeometryGfx::BufferGeometryGfx(const BufferGeometry &geometry) {
   // down on size? r,g,b,a = 0-255 (1byte)
 
   int index = 0;
-  long offset = 0;
+  std::size_t offset = 0;
   for (const auto &a : geometry.attributes) {
-    const GLvoid *offset_ptr = (GLvoid *)offset;  // NOLINT
+    const auto offset_ptr = reinterpret_cast<const GLvoid *>(offset);  // NOLINT
     glEnableVertexAttribArray(index);
     glVertexAttribPointer(index, a.count, a.type, GL_FALSE, stride, offset_ptr);
-    cout << "index=" << index << " a.count=" << a.count << " a.type=" << a.type
-         << " stride=" << stride << " offset=" << offset_ptr << endl;
+    std::cout << "index=" << index << " a.count=" << a.count << " a.type="
+              << a.type << " stride=" << stride << " offset=" << offset_ptr
+              << '\n';
     // Ready the state for the next attribute
-    offset += static_cast<long>(sizeofGlType(a.type) * a.count);
+    offset += static_cast<std::size_t>(sizeofGlType(a.type) * a.count);
     index++;
   }
-  count_ = geometry.vertices.size();
+  count_ = static_cast<int>(geometry.vertices.size());
 
   if (geometry.isIndexed && !geometry.elements.empty()) {
     glGenBuffers(1, &glEbo_);
@@ -89,7 +95,7 @@ BufferGeometryGfx::BufferGeometryGfx(const BufferGeometry &geometry) {
                  geometry.elements.data(), GL_STATIC_DRAW);
   }
 
-  glBindVertexArray(NULL);
+  glBindVertexArray(0);
 }
 
 BufferGeometryGfx::BufferGeometryGfx(BufferGeometryGfx &&other) noexcept
@@ -98,7 +104,7 @@ BufferGeometryGfx::BufferGeometryGfx(BufferGeometryGfx &&other) noexcept
       glEbo_{std::exchange(other.glEbo_, 0)},
       elements_size_{std::exchange(other.elements_size_, 0)},
       count_{std::exchange(other.count_, 0)} {
-  cout << "move construct!!" << endl;
+  std::cout << "move construct!!" << '\n';
 }  // move
 
 auto BufferGeometryGfx::operator=(BufferGeometryGfx &&other) noexcept
@@ -108,12 +114,12 @@ auto BufferGeometryGfx::operator=(BufferGeometryGfx &&other) noexcept
   std::swap(glEbo_, other.glEbo_);
   std::swap(count_, other.count_);
   std::swap(elements_size_, other.elements_size_);
-  cout << "move assign!!" << endl;
+  std::cout << "move assign!!" << '\n';
   return *this;
 }
 
 BufferGeometryGfx::~BufferGeometryGfx() noexcept {
-  cout << "DESTROy!" << endl;
+  std::cout << "DESTROy!" << '\n';
   if (glVao_ > 0) {
     glDeleteVertexArrays(1, &glVao_);
     glVao_ = 0;
@@ -144,6 +150,8 @@ void BufferGeometryGfx::render() const {
 // Helper Functions
 //------------------------------------------------------------------------------
 
+namespace {
+
 auto sizeofGlType(GLenum t) -> int {
   if (t == GL_BYTE) return sizeof(GLbyte);
   if (t == GL_UNSIGNED_BYTE) return sizeof(GLubyte);
@@ -157,5 +165,7 @@ auto sizeofGlType(GLenum t) -> int {
   if (t == GL_DOUBLE) return sizeof(GLdouble);
   return 0;
 }
+
+}  // namespace
 
 }  // namespace app

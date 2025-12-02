@@ -1,5 +1,9 @@
 #include "Logger.h"
 
+#include <cstdarg>
+#include <cstdio>
+#include <iostream>
+#include <string>
 #include <utility>
 
 namespace app {

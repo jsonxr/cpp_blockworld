@@ -2,6 +2,7 @@
 #define APP_WEBGL_WEBGLRESOURCE_H
 
 #include <cstddef>
+#include <cstdint>
 #include <memory>
 
 namespace app {

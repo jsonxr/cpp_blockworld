@@ -1,5 +1,12 @@
 #include "Input.h"
 
+#include <glm/common.hpp>
+#include <glm/geometric.hpp>
+
+#include <GLFW/glfw3.h>
+
+#include "../vendor/glm.h"
+#include "Camera.h"
 #include "constants.h"
 
 namespace app {
@@ -33,16 +40,16 @@ void Input::mouse_button_callback(int button, int action, int /*mods*/) {
 }
 
 void Input::process(Camera &camera, double /*deltaTime*/) {
-  float mx = sensitivity_ * static_cast<float>(deltaMouseX_);
-  float my = sensitivity_ * static_cast<float>(deltaMouseY_);
+  const float mx = sensitivity_ * static_cast<float>(deltaMouseX_);
+  const float my = sensitivity_ * static_cast<float>(deltaMouseY_);
 
   auto options = camera.options();
 
   options.yaw += mx;
   options.pitch += my;
 
-  vec3 local_right = glm::cross(camera.forward(), glm::vec3(0, 1, 0));
-  vec3 local_up = glm::cross(local_right, camera.forward());
+  const vec3 local_right = glm::cross(camera.forward(), glm::vec3(0, 1, 0));
+  const vec3 local_up = glm::cross(local_right, camera.forward());
 
   vec3 xy{0.0, 0.0, 0.0};
   if (Input::isKeyPressed(GLFW_KEY_W)) {
@@ -59,7 +66,7 @@ void Input::process(Camera &camera, double /*deltaTime*/) {
   }
 
   // Normalize the xz space, not the up/down
-  vec3 n = glm::normalize(xy);
+  const vec3 n = glm::normalize(xy);
   xy = glm::isnan(n.x) ? xy : n;  // Use the normalized vector if it's not zero
   xy *= kPlayerSpeed;             // Go speed in the normalized direction
 

@@ -2,6 +2,7 @@
 #define APP_CORE_LOGGER_H
 
 #include <cstdarg>
+#include <cstdint>
 #include <iostream>
 #include <string>
 
@@ -11,7 +12,7 @@ namespace app {
 
 class Logger {
  public:
-  enum class LogLevel {
+  enum class LogLevel : std::uint8_t {
     kError [[maybe_unused]] = 0,
     kWarn = 1,
     kInfo = 2,

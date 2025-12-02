@@ -1,6 +1,7 @@
 #ifndef MINECRAFT_WINDOW_H
 #define MINECRAFT_WINDOW_H
 #include "../core.h"
+#include <cstdint>
 #include "Camera.h"
 #include "constants.h"
 #include "Input.h"
@@ -15,7 +16,7 @@ struct WindowSize {
   int height{kDefaultWindowHeight};
 };
 
-enum class CursorMode { kLocked, kNormal };
+enum class CursorMode : std::uint8_t { kLocked, kNormal };
 
 // struct Destroy_GLFWwindow {
 //   void operator()(GLFWwindow* ptr) { glfwDestroyWindow(ptr); }

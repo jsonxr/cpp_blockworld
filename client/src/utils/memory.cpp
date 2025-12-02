@@ -13,9 +13,10 @@
 
 #include <cmath>
 #include <cstdint>
-#include <functional>
 #include <iostream>
 #include <string>
+
+// NOLINTBEGIN
 
 #ifdef _DEBUG
 thread_local bool debug_ = false;
@@ -101,3 +102,5 @@ auto prettyBytes(size_t bytes) -> std::string {
 }
 
 }  // namespace utils
+
+// NOLINTEND

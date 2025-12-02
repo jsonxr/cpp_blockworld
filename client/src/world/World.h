@@ -15,7 +15,7 @@ class Chunk;
 
 class World {
  public:
-  auto getBlock(const ivec3 loc) -> Block *;
+  auto getBlock(ivec3 loc) -> Block *;
 
  private:
   std::vector<std::unique_ptr<Chunk>> chunks_;

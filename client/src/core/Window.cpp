@@ -1,10 +1,19 @@
 #include "Window.h"
 
+#include <iostream>
+
+#ifndef __EMSCRIPTEN__
+#include <glad/glad.h>
+#endif
+#include <GLFW/glfw3.h>
+
 namespace app {
 
 //------------------------------------------------------------------------------
 // glfw Callbacks
 //------------------------------------------------------------------------------
+
+namespace {
 
 void windowsize_callback(GLFWwindow *native_window, int width, int height) {
   auto *window = static_cast<Window *>(glfwGetWindowUserPointer(native_window));
@@ -40,6 +49,8 @@ void mouse_button_callback(GLFWwindow *native_window, int button, int action,
   window->input().mouse_button_callback(button, action, mods);
 }
 
+}  // namespace
+
 //------------------------------------------------------------------------------
 // Constructors
 //------------------------------------------------------------------------------
@@ -61,7 +72,7 @@ Window::Window(const char *title, WindowSize size, bool fullScreenMode) noexcept
                                     primary_monitor_, nullptr);
 
   if (native_window_ == nullptr) {
-    std::cerr << "Failed to create GLFW window\n" << std::endl;
+    std::cerr << "Failed to create GLFW window\n";
     return;
   }
 
@@ -71,7 +82,7 @@ Window::Window(const char *title, WindowSize size, bool fullScreenMode) noexcept
   auto loader =
       gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
   if (loader == 0) {
-    std::cerr << "Failed to initialize GLAD." << std::endl;
+    std::cerr << "Failed to initialize GLAD." << '\n';
     return;
   }
 #endif
@@ -107,7 +118,7 @@ void Window::onResize(int width, int height) {
   this->size_.width = width;
   this->size_.height = height;
   glViewport(0, 0, width, height);
-  float aspect = static_cast<float>(width) / static_cast<float>(height);
+  const float aspect = static_cast<float>(width) / static_cast<float>(height);
   auto options = camera_.options();
   options.aspect = aspect;
   camera_.set_options(options);
@@ -133,11 +144,13 @@ void Window::process(double deltaTime) {
 }
 
 [[maybe_unused]] void Window::setCursorMode(CursorMode cursorMode) {
-  int glfw_cursor_mode =
-      cursorMode == CursorMode::kLocked   ? GLFW_CURSOR_DISABLED
-      : cursorMode == CursorMode::kNormal ? GLFW_CURSOR_NORMAL
-                                          : GLFW_CURSOR_HIDDEN;
-  glfwSetInputMode((GLFWwindow *)native_window_, GLFW_CURSOR, glfw_cursor_mode);
+  int glfw_cursor_mode = GLFW_CURSOR_DISABLED;
+  if (cursorMode == CursorMode::kNormal) {
+    glfw_cursor_mode = GLFW_CURSOR_NORMAL;
+  } else if (cursorMode == CursorMode::kLocked) {
+    glfw_cursor_mode = GLFW_CURSOR_DISABLED;
+  }
+  glfwSetInputMode(native_window_, GLFW_CURSOR, glfw_cursor_mode);
 }
 
 void Window::pollEvents() { glfwPollEvents(); }

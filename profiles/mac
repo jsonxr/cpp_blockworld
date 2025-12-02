@@ -1,7 +1,7 @@
 [settings]
 build_type=Release
-os=Emscripten
-arch=wasm
+os=Macos
+arch=armv8
 compiler=clang
 compiler.version=21
 compiler.libcxx=libc++

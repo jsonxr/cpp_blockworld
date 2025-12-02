@@ -14,10 +14,10 @@ namespace app {
 
 struct Face {
  public:
-  std::string texture{};
+  std::string texture;
 };
 
-enum class BlockType {
+enum class BlockType : std::uint8_t {
   kNull,
   kSolid,
   // kTransparent,
@@ -26,7 +26,7 @@ enum class BlockType {
 struct Block {
  public:
   BlockType type{BlockType::kSolid};
-  std::string name{};
+  std::string name;
   bool is_transparent{};
   Face xp{};
   Face xn{};

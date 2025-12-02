@@ -16,9 +16,9 @@ class Material {
   //auto model() -> GLUniform * {return location_model_;}
 
  private:
-  GLProgram program_{};
-  GLuint texture_{};
-  std::shared_ptr<TextureAtlas> textures_{};
+  GLProgram program_;
+  GLuint texture_{0};
+  std::shared_ptr<TextureAtlas> textures_;
   GLUniform *u_model_{};
   GLUniform *u_texture0_{};
   GLUniform *u_view_{};

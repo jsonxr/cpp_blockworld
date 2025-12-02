@@ -1,0 +1,7 @@
+[tools]
+#clang = "21.1"
+conan = "2.23"
+pipx = "1.8"
+
+[env]
+BLOCKWORLD_ASSETS_PATH = "{{ config_root }}/client/assets"

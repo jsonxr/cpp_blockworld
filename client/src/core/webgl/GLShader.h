@@ -2,12 +2,13 @@
 #define APP_WEBGLSHADER_H
 
 #include <string>
+#include <utility>
 
 #include "../../core.h"
 
 namespace app {
 
-enum class WebGLShaderType : GLenum {
+enum class WebGLShaderType : std::uint16_t {
   kFragment = GL_FRAGMENT_SHADER,
   kVertex = GL_VERTEX_SHADER,
 };

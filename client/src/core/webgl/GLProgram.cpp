@@ -1,14 +1,32 @@
 #include "GLProgram.h"
 
 #include <array>
+#include <cstdio>
+#include <iostream>
+#include <string>
+
+#ifdef __EMSCRIPTEN__
+#include <regex>
+#endif
+
+#include "../../vendor/glfw.h"
+#include "../../core.h"
+#include "GLAttribute.h"
+#include "GLShader.h"
+#include "GLTypes.h"
+#include "GLUniform.h"
+#include "IntResource.h"
 
 #include "../../vendor/glm.h"
 #include "../Assets.h"
 
+
 namespace app {
 
+namespace {
+
 auto loadShaderIntoString(const std::string &filename) -> std::string {
-  std::string contents = Assets::loadString(filename);
+  auto contents = app::Assets::loadString(filename);
 #ifdef __EMSCRIPTEN__
   static const std::regex kOpenglVersion{"#version 330 core"};
   contents = std::regex_replace(contents, kOpenglVersion,
@@ -29,22 +47,24 @@ void compile(GLuint handle, const GLShader &vertex, const GLShader &fragment) {
     std::array<GLchar, kMaxLogLength> log{};
     glGetProgramInfoLog(handle, sizeof(log), nullptr, log.data());
     std::cout << "ERROR::program::COMPILATION_FAILED\n"
-              << log.data() << std::endl;
+              << log.data() << '\n';
     return;
   }
 
-  std::cout << "created WebGLProgram " << handle << std::endl;
+  std::cout << "created WebGLProgram " << handle << '\n';
 }
+
+}  // namespace
 
 auto GLProgram::create(const std::string &vertex, const std::string &fragment)
     -> GLProgram {
-  std::string vertex_shader_source = loadShaderIntoString(vertex);
-  std::string fragment_shader_source = loadShaderIntoString(fragment);
+  const auto vertex_shader_source = loadShaderIntoString(vertex);
+  const auto fragment_shader_source = loadShaderIntoString(fragment);
 
-  GLShader vertex_shader{WebGLShaderType::kVertex,
-                         vertex_shader_source.c_str()};
-  GLShader fragment_shader{WebGLShaderType::kFragment,
-                           fragment_shader_source.c_str()};
+  const GLShader vertex_shader{WebGLShaderType::kVertex,
+                               vertex_shader_source.c_str()};
+  const GLShader fragment_shader{WebGLShaderType::kFragment,
+                                 fragment_shader_source.c_str()};
   return GLProgram{vertex_shader, fragment_shader};
 }
 
@@ -55,8 +75,7 @@ GLProgram::GLProgram(const GLShader &vertexShader,
 }
 
 void GLProgram::debug() {
-  GLuint i;
-  GLint count;
+  GLint count = 0;
 
   const GLsizei buf_size = 32;          // maximum name length
   std::array<GLchar, buf_size> name{};  // variable name in GLSL
@@ -65,7 +84,7 @@ void GLProgram::debug() {
 
   glGetProgramiv(handle(), GL_ACTIVE_ATTRIBUTES, &count);
   printf("Active Attributes: %d\n", count);
-  for (i = 0; i < count; i++) {
+  for (GLint i = 0; i < count; i++) {
     GLAttribute attribute{};
 
     glGetActiveAttrib(handle(), i, buf_size, &length, &attribute.size, &type,
@@ -83,7 +102,7 @@ void GLProgram::debug() {
 
   // Discover the uniforms
   glGetProgramiv(handle(), GL_ACTIVE_UNIFORMS, &count);
-  for (i = 0; i < count; i++) {
+  for (GLint i = 0; i < count; i++) {
     GLUniform uniform{};
     glGetActiveUniform(handle(), i, buf_size, &length, &uniform.size, &type,
                        name.data());
@@ -98,7 +117,7 @@ auto GLProgram::use() const noexcept -> bool {
   if (handle() > 0) {
     glUseProgram(handle());
   } else {
-    std::cerr << "WebGLProgram can't use" << handle() << std::endl;
+    std::cerr << "WebGLProgram can't use" << handle() << '\n';
   }
   return handle() != 0U;
 }

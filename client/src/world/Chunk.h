@@ -32,7 +32,7 @@ class Chunk {
   vec3 pos_{};
   int width_{kChunkWidth};
   int height_{kChunkHeight};
-  ChunkData data_{};
+  ChunkData data_;
 };
 
 class ChunkGfx {
